@@ -1,5 +1,6 @@
 package br.kuhnen.menssages.service.message;
 
+import br.kuhnen.menssages.interfaces.IEvent;
 import br.kuhnen.menssages.service.RabbitService;
 import com.rabbitmq.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,18 @@ public class ReceiveMessagesService {
 
     @PostConstruct
     public void listenMessages() {
-        this.receiveMessages();
+//        this.receiveMessages();
+        String handlerName = this.getClass().getName();
+        System.out.println("Registrando o listenter " + handlerName);
+        this.rabbitService.registerQueue(handlerName, this::listenMessageEvents, 2, QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
     }
 
-    public void receiveMessages() {
+    private void listenMessageEvents(IEvent iEvent) {
+        System.out.println(iEvent.getType());
+        System.out.println(iEvent.getMessage());
+    }
+
+    protected void receiveMessages() {
 
         try {
             Channel channel = this.rabbitService.createChannel();

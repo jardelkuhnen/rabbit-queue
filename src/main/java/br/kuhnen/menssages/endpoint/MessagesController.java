@@ -32,8 +32,9 @@ public class MessagesController {
     @PostMapping
     @RequestMapping("/user")
     public ResponseEntity enviarMensagem(@RequestBody String menssagem) {
-        String retorno = this.publishMessagesService.enviarMensagem(menssagem);
-        return ResponseEntity.ok(retorno);
+//        String retorno = this.publishMessagesService.enviarMensagem(menssagem);
+        this.publishMessagesService.enviarMsg(menssagem);
+        return ResponseEntity.ok("retorno");
     }
 
     @PostMapping

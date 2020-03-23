@@ -1,5 +1,8 @@
 package br.kuhnen.menssages.service.message;
 
+import br.kuhnen.menssages.enuns.EventType;
+import br.kuhnen.menssages.event.MessageEvent;
+import br.kuhnen.menssages.interfaces.IEvent;
 import br.kuhnen.menssages.service.RabbitService;
 import com.rabbitmq.client.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +17,7 @@ import java.util.concurrent.TimeoutException;
 public class PublishMessagesService {
 
     private final RabbitService rabbitService;
-    private final String EXCHANGE_TIPE = "direct";
+    private final String EXCHANGE_TIPE = "topic";
     private final String QUEUE_NAME = "user-messages";
     private final String ROUTING_KEY = "user-messages-key";
     private final String EXCHANGE_NAME = "user-messages-exchange";
@@ -50,4 +53,9 @@ public class PublishMessagesService {
         return "";
     }
 
+    public void enviarMsg(String menssagem) {
+        MessageEvent event = new MessageEvent(EventType.SEND_USUARIO_MENSAGEM, menssagem);
+
+        this.rabbitService.handleMessage(QUEUE_NAME, EXCHANGE_NAME, EXCHANGE_TIPE, ROUTING_KEY, event, "listenMessageEvents");
+    }
 }
