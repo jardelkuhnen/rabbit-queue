@@ -1,5 +1,6 @@
-package br.kuhnen.menssages.service;
+package br.kuhnen.menssages.service.message;
 
+import br.kuhnen.menssages.service.RabbitService;
 import com.rabbitmq.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

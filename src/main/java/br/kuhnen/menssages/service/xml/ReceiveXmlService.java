@@ -1,5 +1,6 @@
-package br.kuhnen.menssages.service;
+package br.kuhnen.menssages.service.xml;
 
+import br.kuhnen.menssages.service.RabbitService;
 import br.kuhnen.menssages.util.InfoXml;
 import br.kuhnen.menssages.util.XmlExtractorUtil;
 import com.rabbitmq.client.*;

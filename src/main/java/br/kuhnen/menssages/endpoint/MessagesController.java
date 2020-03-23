@@ -1,9 +1,9 @@
 package br.kuhnen.menssages.endpoint;
 
-import br.kuhnen.menssages.service.PublishMessagesService;
-import br.kuhnen.menssages.service.PublishXmlService;
-import br.kuhnen.menssages.service.ReceiveMessagesService;
-import br.kuhnen.menssages.service.ReceiveXmlService;
+import br.kuhnen.menssages.service.message.PublishMessagesService;
+import br.kuhnen.menssages.service.xml.PublishXmlService;
+import br.kuhnen.menssages.service.message.ReceiveMessagesService;
+import br.kuhnen.menssages.service.xml.ReceiveXmlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
