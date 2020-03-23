@@ -1,35 +1,36 @@
 package br.kuhnen.menssages.service;
 
+import br.kuhnen.menssages.util.InfoXml;
+import br.kuhnen.menssages.util.XmlExtractorUtil;
 import com.rabbitmq.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 
 @Service
-public class ReceiveMessagesService {
+public class ReceiveXmlService {
 
     private final RabbitService rabbitService;
-    private final String QUEUE_NAME = "user-messages";
-    private final String ROUTING_KEY = "user-messages-key";
-    private final String EXCHANGE_NAME = "user-messages-exchange";
-    private final Charset UTF_8_CHAR_SET = Charset.forName("UTF-8");
+    private final String QUEUE_NAME = "xml-messages";
+    private final String ROUTING_KEY = "xml-messages-key";
+    private final String EXCHANGE_NAME = "xml-messages-exchange";
 
     @Autowired
-    public ReceiveMessagesService(RabbitService rabbitService) {
+    public ReceiveXmlService(RabbitService rabbitService) {
         this.rabbitService = rabbitService;
     }
 
     @PostConstruct
     public void listenMessages() {
-        this.receiveMessages();
+        this.receiveXmls();
     }
 
-    public void receiveMessages() {
-
+    public void receiveXmls() {
         try {
             Channel channel = this.rabbitService.createChannel();
 
@@ -38,8 +39,12 @@ public class ReceiveMessagesService {
             Consumer consumer = new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                    String mensagem = new String(body, UTF_8_CHAR_SET);
-                    System.out.println("Mensagem recebida: " + mensagem + ". Horário: " + LocalDateTime.now());
+
+                    InfoXml infoXml = XmlExtractorUtil.getInfoXml(body);
+
+                    System.out.println("Mensagem recebida: " + infoXml.getChaveAcesso() + ". Horário: " + LocalDateTime.now());
+                    System.out.println(infoXml.getXml());
+
                 }
             };
 
@@ -48,6 +53,4 @@ public class ReceiveMessagesService {
             e.printStackTrace();
         }
     }
-
-
 }

@@ -78,4 +78,18 @@ public class RabbitService {
         }
 
     }
+
+    public Boolean closeChannel(Channel channel) {
+        if (channel != null && channel.isOpen()) {
+            try {
+                channel.close();
+            } catch (IOException | TimeoutException e) {
+                e.printStackTrace();
+                return Boolean.FALSE;
+            }
+
+        }
+
+        return Boolean.TRUE;
+    }
 }
