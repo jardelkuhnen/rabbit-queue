@@ -123,8 +123,6 @@ public class RabbitService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     public void handleMessage(String queueName, String exchangeName, String exchangeTipe, String routingKey, IEvent event, String handlerName) {
@@ -137,8 +135,6 @@ public class RabbitService {
 
             channel.exchangeDeclare(exchangeName, exchangeTipe);
 
-//            channel.queueDeclare(queueName, false, false, false, null);
-
             ObjectMapper mapper = new ObjectMapper();
             String message = mapper.writeValueAsString(new EventPayload(event, handlerName));
             message = StringUtils.stripAccents(message);
@@ -146,13 +142,10 @@ public class RabbitService {
 
             System.out.println("Mensagem enviada. " + "Horário: " + LocalDateTime.now());
 
-
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             this.closeChannel(channel);
         }
-
-
     }
 }

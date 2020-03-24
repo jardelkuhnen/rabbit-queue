@@ -24,6 +24,7 @@ public class EventPayload {
         this.className = event.getClass().getName();
         this.handlerName = handlerName;
         ObjectMapper mapper = new ObjectMapper();
+
         try {
             this.event = mapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {

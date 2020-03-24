@@ -29,6 +29,7 @@ public class ReceiveMessagesService {
 //        this.receiveMessages();
         String handlerName = this.getClass().getName();
         System.out.println("Registrando o evento " + handlerName);
+
         this.rabbitService.registerQueue(handlerName, this::listenMessageEvents, 2, QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
     }
 

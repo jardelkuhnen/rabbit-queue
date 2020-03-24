@@ -2,6 +2,7 @@ package br.kuhnen.menssages.service.xml;
 
 import br.kuhnen.menssages.enuns.EventType;
 import br.kuhnen.menssages.event.MessageEvent;
+import br.kuhnen.menssages.interfaces.IProcessEvent;
 import br.kuhnen.menssages.service.RabbitService;
 import com.rabbitmq.client.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,7 @@ public class PublishXmlService {
 
             MessageEvent event = new MessageEvent(EventType.SEND_XML, menssagem);
 
-            this.rabbitService.handleMessage(QUEUE_NAME, EXCHANGE_NAME, EXCHANGE_TIPE, ROUTING_KEY, event, "listenMessageEvents");
+            this.rabbitService.handleMessage(QUEUE_NAME, EXCHANGE_NAME, EXCHANGE_TIPE, ROUTING_KEY, event, IProcessEvent.class.getDeclaredMethods()[0].toString());
 
         } catch (IOException e) {
             e.printStackTrace();
