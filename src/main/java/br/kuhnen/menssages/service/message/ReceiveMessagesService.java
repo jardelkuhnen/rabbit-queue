@@ -1,6 +1,7 @@
 package br.kuhnen.menssages.service.message;
 
 import br.kuhnen.menssages.interfaces.IEvent;
+import br.kuhnen.menssages.interfaces.IProcessEvent;
 import br.kuhnen.menssages.service.RabbitService;
 import com.rabbitmq.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 @Service
-public class ReceiveMessagesService {
+public class ReceiveMessagesService implements IProcessEvent {
 
     private final RabbitService rabbitService;
     private final String QUEUE_NAME = "user-messages";
@@ -30,10 +31,11 @@ public class ReceiveMessagesService {
         String handlerName = this.getClass().getName();
         System.out.println("Registrando o evento " + handlerName);
 
-        this.rabbitService.registerQueue(handlerName, this::listenMessageEvents, 2, QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
+        this.rabbitService.registerQueue(handlerName, this::processEvents, 2, QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
     }
 
-    private void listenMessageEvents(IEvent event) {
+    @Override
+    public void processEvents(IEvent event) {
         System.out.println("Processando evento recebido. " + event.getType() + "Clazz: " + event.getClass());
         System.out.println(event.getMessage());
     }
