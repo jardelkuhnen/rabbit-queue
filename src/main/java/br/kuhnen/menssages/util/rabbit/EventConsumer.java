@@ -1,4 +1,4 @@
-package br.kuhnen.menssages.util;
+package br.kuhnen.menssages.util.rabbit;
 
 import br.kuhnen.menssages.interfaces.ICallbackEvent;
 import com.rabbitmq.client.AMQP;

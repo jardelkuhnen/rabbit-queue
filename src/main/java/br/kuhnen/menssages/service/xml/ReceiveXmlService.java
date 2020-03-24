@@ -50,7 +50,7 @@ public class ReceiveXmlService {
 
             Consumer consumer = new DefaultConsumer(channel) {
                 @Override
-                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
 
                     InfoXml infoXml = XmlExtractorUtil.getInfoXml(body);
 

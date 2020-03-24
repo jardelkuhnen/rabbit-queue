@@ -1,4 +1,4 @@
-package br.kuhnen.menssages.util;
+package br.kuhnen.menssages.util.rabbit;
 
 import br.kuhnen.menssages.interfaces.IEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;

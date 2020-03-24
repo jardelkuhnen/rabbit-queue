@@ -2,17 +2,14 @@ package br.kuhnen.menssages.service.message;
 
 import br.kuhnen.menssages.enuns.EventType;
 import br.kuhnen.menssages.event.MessageEvent;
-import br.kuhnen.menssages.interfaces.IEvent;
 import br.kuhnen.menssages.service.RabbitService;
-import br.kuhnen.menssages.util.EventPayload;
 import com.rabbitmq.client.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.concurrent.TimeoutException;
 
 @Service
 public class PublishMessagesService {
@@ -22,7 +19,6 @@ public class PublishMessagesService {
     private final String QUEUE_NAME = "user-messages";
     private final String ROUTING_KEY = "user-messages-key";
     private final String EXCHANGE_NAME = "user-messages-exchange";
-    private final Charset UTF_8_CHAR_SET = Charset.forName("UTF-8");
 
     @Autowired
     public PublishMessagesService(RabbitService rabbitService) {
@@ -43,7 +39,7 @@ public class PublishMessagesService {
 
             System.out.println("Mensagem enviada. " + "Horário: " + LocalDateTime.now());
 
-            channel.basicPublish(EXCHANGE_NAME, ROUTING_KEY, null, mensagem.getBytes(UTF_8_CHAR_SET));
+            channel.basicPublish(EXCHANGE_NAME, ROUTING_KEY, null, mensagem.getBytes(StandardCharsets.UTF_8));
 
         } catch (IOException e) {
             e.printStackTrace();

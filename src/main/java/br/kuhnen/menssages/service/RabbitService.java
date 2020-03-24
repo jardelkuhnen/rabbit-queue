@@ -1,11 +1,10 @@
 package br.kuhnen.menssages.service;
 
 import br.kuhnen.menssages.configuration.RabbitConfiguration;
-import br.kuhnen.menssages.event.MessageEvent;
 import br.kuhnen.menssages.interfaces.ICallbackEvent;
 import br.kuhnen.menssages.interfaces.IEvent;
-import br.kuhnen.menssages.util.EventConsumer;
-import br.kuhnen.menssages.util.EventPayload;
+import br.kuhnen.menssages.util.rabbit.EventConsumer;
+import br.kuhnen.menssages.util.rabbit.EventPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeoutException;
 
@@ -29,7 +27,6 @@ public class RabbitService {
     private RabbitConfiguration rabbitConfiguration;
 
     private Connection connection;
-    private final Charset UTF_8_CHAR_SET = Charset.forName("UTF-8");
 
     public Connection getRabbitConnection() {
 
