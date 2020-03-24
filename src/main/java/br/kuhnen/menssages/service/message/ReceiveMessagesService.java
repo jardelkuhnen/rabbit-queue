@@ -29,13 +29,13 @@ public class ReceiveMessagesService {
     public void listenMessages() {
 //        this.receiveMessages();
         String handlerName = this.getClass().getName();
-        System.out.println("Registrando o listenter " + handlerName);
+        System.out.println("Registrando o evento " + handlerName);
         this.rabbitService.registerQueue(handlerName, this::listenMessageEvents, 2, QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
     }
 
-    private void listenMessageEvents(IEvent iEvent) {
-        System.out.println(iEvent.getType());
-        System.out.println(iEvent.getMessage());
+    private void listenMessageEvents(IEvent event) {
+        System.out.println("Processando evento recebido. " + event.getType() + "Clazz: " + event.getClass());
+        System.out.println(event.getMessage());
     }
 
     protected void receiveMessages() {

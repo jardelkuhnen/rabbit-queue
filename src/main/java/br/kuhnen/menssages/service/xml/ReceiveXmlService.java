@@ -1,5 +1,6 @@
 package br.kuhnen.menssages.service.xml;
 
+import br.kuhnen.menssages.interfaces.IEvent;
 import br.kuhnen.menssages.service.RabbitService;
 import br.kuhnen.menssages.util.InfoXml;
 import br.kuhnen.menssages.util.XmlExtractorUtil;
@@ -8,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 
 @Service
@@ -28,13 +27,25 @@ public class ReceiveXmlService {
 
     @PostConstruct
     public void listenMessages() {
-        this.receiveXmls();
+//        this.receiveXmls();
+        String handlerName = this.getClass().getName();
+        System.out.println("Registrando o evento " + handlerName);
+        this.rabbitService.registerQueue(handlerName, this::listenMessageEvents, 2, QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
+
+    }
+
+    private void listenMessageEvents(IEvent event) {
+        System.out.println("Recebido evento " + event.getClass() + " para processamento");
+
+        InfoXml infoXml = XmlExtractorUtil.getInfoXml(event.getMessage().getBytes());
+        System.out.println(infoXml);
     }
 
     public void receiveXmls() {
         try {
             Channel channel = this.rabbitService.createChannel();
 
+            this.rabbitService.declareExchange(EXCHANGE_NAME, "topic");
             channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
 
             Consumer consumer = new DefaultConsumer(channel) {

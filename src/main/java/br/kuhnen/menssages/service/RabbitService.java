@@ -3,6 +3,7 @@ package br.kuhnen.menssages.service;
 import br.kuhnen.menssages.configuration.RabbitConfiguration;
 import br.kuhnen.menssages.event.MessageEvent;
 import br.kuhnen.menssages.interfaces.ICallbackEvent;
+import br.kuhnen.menssages.interfaces.IEvent;
 import br.kuhnen.menssages.util.EventConsumer;
 import br.kuhnen.menssages.util.EventPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -129,7 +130,7 @@ public class RabbitService {
 
     }
 
-    public void handleMessage(String queueName, String exchangeName, String exchangeTipe, String routingKey, MessageEvent event, String handlerName) {
+    public void handleMessage(String queueName, String exchangeName, String exchangeTipe, String routingKey, IEvent event, String handlerName) {
 
         Channel channel = null;
 
@@ -144,7 +145,7 @@ public class RabbitService {
             ObjectMapper mapper = new ObjectMapper();
             String message = mapper.writeValueAsString(new EventPayload(event, handlerName));
             message = StringUtils.stripAccents(message);
-            channel.basicPublish(exchangeName, routingKey, null, event.getMessage().getBytes(UTF_8_CHAR_SET));
+            channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
 
             System.out.println("Mensagem enviada. " + "Horário: " + LocalDateTime.now());
 

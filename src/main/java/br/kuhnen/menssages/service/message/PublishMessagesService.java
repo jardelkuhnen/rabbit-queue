@@ -4,6 +4,7 @@ import br.kuhnen.menssages.enuns.EventType;
 import br.kuhnen.menssages.event.MessageEvent;
 import br.kuhnen.menssages.interfaces.IEvent;
 import br.kuhnen.menssages.service.RabbitService;
+import br.kuhnen.menssages.util.EventPayload;
 import com.rabbitmq.client.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

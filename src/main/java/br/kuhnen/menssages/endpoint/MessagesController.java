@@ -41,10 +41,11 @@ public class MessagesController {
     @RequestMapping("/xml")
     public ResponseEntity postXml(@RequestParam("file") MultipartFile file) {
 
-        this.publishXmlService.sendXml(file);
-        System.out.println(file.getSize());
+//        this.publishXmlService.sendXml(file);
 
-        return ResponseEntity.ok("");
+        this.publishXmlService.enviarXml(file);
+
+        return ResponseEntity.ok("Enviado xml para processamento");
     }
 
 }
