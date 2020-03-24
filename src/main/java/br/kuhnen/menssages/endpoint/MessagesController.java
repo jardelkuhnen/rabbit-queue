@@ -32,18 +32,20 @@ public class MessagesController {
     @PostMapping
     @RequestMapping("/user")
     public ResponseEntity enviarMensagem(@RequestBody String menssagem) {
-        String retorno = this.publishMessagesService.enviarMensagem(menssagem);
-        return ResponseEntity.ok(retorno);
+//        String retorno = this.publishMessagesService.enviarMensagem(menssagem);
+        this.publishMessagesService.enviarMsg(menssagem);
+        return ResponseEntity.ok("retorno");
     }
 
     @PostMapping
     @RequestMapping("/xml")
     public ResponseEntity postXml(@RequestParam("file") MultipartFile file) {
 
-        this.publishXmlService.sendXml(file);
-        System.out.println(file.getSize());
+//        this.publishXmlService.sendXml(file);
 
-        return ResponseEntity.ok("");
+        this.publishXmlService.enviarXml(file);
+
+        return ResponseEntity.ok("Enviado xml para processamento");
     }
 
 }

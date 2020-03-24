@@ -1,5 +1,6 @@
 package br.kuhnen.menssages.service.message;
 
+import br.kuhnen.menssages.interfaces.IEvent;
 import br.kuhnen.menssages.service.RabbitService;
 import com.rabbitmq.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 @Service
@@ -17,7 +18,6 @@ public class ReceiveMessagesService {
     private final String QUEUE_NAME = "user-messages";
     private final String ROUTING_KEY = "user-messages-key";
     private final String EXCHANGE_NAME = "user-messages-exchange";
-    private final Charset UTF_8_CHAR_SET = Charset.forName("UTF-8");
 
     @Autowired
     public ReceiveMessagesService(RabbitService rabbitService) {
@@ -26,10 +26,18 @@ public class ReceiveMessagesService {
 
     @PostConstruct
     public void listenMessages() {
-        this.receiveMessages();
+//        this.receiveMessages();
+        String handlerName = this.getClass().getName();
+        System.out.println("Registrando o evento " + handlerName);
+        this.rabbitService.registerQueue(handlerName, this::listenMessageEvents, 2, QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
     }
 
-    public void receiveMessages() {
+    private void listenMessageEvents(IEvent event) {
+        System.out.println("Processando evento recebido. " + event.getType() + "Clazz: " + event.getClass());
+        System.out.println(event.getMessage());
+    }
+
+    protected void receiveMessages() {
 
         try {
             Channel channel = this.rabbitService.createChannel();
@@ -39,7 +47,7 @@ public class ReceiveMessagesService {
             Consumer consumer = new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                    String mensagem = new String(body, UTF_8_CHAR_SET);
+                    String mensagem = new String(body, StandardCharsets.UTF_8);
                     System.out.println("Mensagem recebida: " + mensagem + ". Horário: " + LocalDateTime.now());
                 }
             };

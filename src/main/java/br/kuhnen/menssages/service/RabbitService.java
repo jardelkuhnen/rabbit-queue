@@ -1,25 +1,32 @@
 package br.kuhnen.menssages.service;
 
 import br.kuhnen.menssages.configuration.RabbitConfiguration;
+import br.kuhnen.menssages.interfaces.ICallbackEvent;
+import br.kuhnen.menssages.interfaces.IEvent;
+import br.kuhnen.menssages.util.rabbit.EventConsumer;
+import br.kuhnen.menssages.util.rabbit.EventPayload;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.rabbitmq.client.Consumer;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeoutException;
 
+@Slf4j
 @Service
 public class RabbitService {
 
     @Autowired
     private RabbitConfiguration rabbitConfiguration;
-    private Connection connection;
 
-    private final Logger log = LoggerFactory.getLogger(RabbitService.class);
+    private Connection connection;
 
     public Connection getRabbitConnection() {
 
@@ -91,5 +98,61 @@ public class RabbitService {
         }
 
         return Boolean.TRUE;
+    }
+
+    public void registerQueue(String handlerName, ICallbackEvent callback, Integer quantidadeConsumers, String queueName, String exchangeName, String routingKey) {
+
+        Channel channel = null;
+
+        try {
+            channel = this.createChannel();
+
+            this.declareExchange(exchangeName, "topic");
+            channel.queueDeclare(queueName, false, false, false, null);
+
+            channel.queueBind(queueName, exchangeName, routingKey);
+
+            for (int i = 0; i < quantidadeConsumers; i++) {
+                Consumer consumer = new EventConsumer(callback, handlerName, channel);
+
+                channel.basicConsume(queueName, true, consumer);
+            }
+
+            channel = null;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public void handleMessage(String queueName, String exchangeName, String exchangeTipe, String routingKey, IEvent event, String handlerName) {
+
+        Channel channel = null;
+
+        try {
+
+            channel = this.createChannel();
+
+            channel.exchangeDeclare(exchangeName, exchangeTipe);
+
+//            channel.queueDeclare(queueName, false, false, false, null);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String message = mapper.writeValueAsString(new EventPayload(event, handlerName));
+            message = StringUtils.stripAccents(message);
+            channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
+
+            System.out.println("Mensagem enviada. " + "Horário: " + LocalDateTime.now());
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            this.closeChannel(channel);
+        }
+
+
     }
 }
