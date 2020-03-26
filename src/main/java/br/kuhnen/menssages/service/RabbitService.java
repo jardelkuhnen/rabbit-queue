@@ -104,7 +104,7 @@ public class RabbitService {
         return Boolean.TRUE;
     }
 
-    public void registerQueue(String eventName, String handlerName, ICallbackEvent callback, Integer quantidadeConsumers) {
+    public void registerQueue(String eventName, String handlerName, ICallbackEvent callback, Integer qtdConsumers) {
 
         Channel channel = null;
 
@@ -119,7 +119,7 @@ public class RabbitService {
 
             channel.queueBind(queueName, eventName, routingKey);
 
-            for (int i = 0; i < quantidadeConsumers; i++) {
+            for (int i = 0; i < qtdConsumers; i++) {
                 Consumer consumer = new EventConsumer(callback, handlerName, channel);
 
                 channel.basicConsume(queueName, false, consumer);

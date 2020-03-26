@@ -17,6 +17,7 @@ import javax.annotation.PostConstruct;
 public class ReceiveXmlService implements IProcessEvent {
 
     private final RabbitService rabbitService;
+    private final Integer QTD_CONSUMERS = 2;
 
     @Autowired
     public ReceiveXmlService(RabbitService rabbitService) {
@@ -28,7 +29,7 @@ public class ReceiveXmlService implements IProcessEvent {
         String handlerName = this.getClass().getName();
         log.info("Registering the event: " + handlerName);
 
-        this.rabbitService.registerQueue(EventType.SEND_XML.name(), handlerName, this::processEvents, 2);
+        this.rabbitService.registerQueue(EventType.SEND_XML.name(), handlerName, this::processEvents, QTD_CONSUMERS);
     }
 
     @Override
