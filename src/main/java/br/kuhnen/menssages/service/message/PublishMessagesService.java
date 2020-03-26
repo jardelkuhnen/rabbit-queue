@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 public class PublishMessagesService {
 
     private final RabbitService rabbitService;
-    private final String EXCHANGE_TIPE = "topic";
     private final String QUEUE_NAME = "user-messages";
     private final String ROUTING_KEY = "user-messages-key";
     private final String EXCHANGE_NAME = "user-messages-exchange";
@@ -26,34 +25,10 @@ public class PublishMessagesService {
         this.rabbitService = rabbitService;
     }
 
-    public String enviarMensagem(String mensagem) {
-
-        Channel channel = null;
-
-        try {
-
-            channel = this.rabbitService.createChannel();
-
-            this.rabbitService.declareExchange(EXCHANGE_NAME, EXCHANGE_TIPE);
-
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-
-            System.out.println("Mensagem enviada. " + "Horário: " + LocalDateTime.now());
-
-            channel.basicPublish(EXCHANGE_NAME, ROUTING_KEY, null, mensagem.getBytes(StandardCharsets.UTF_8));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            this.rabbitService.closeChannel(channel);
-        }
-
-        return "";
-    }
 
     public void enviarMsg(String menssagem) {
         MessageEvent event = new MessageEvent(EventType.SEND_USUARIO_MENSAGEM, menssagem);
 
-        this.rabbitService.handleMessage(QUEUE_NAME, EXCHANGE_NAME, EXCHANGE_TIPE, ROUTING_KEY, event, IProcessEvent.class.getDeclaredMethods()[0].toString());
+        this.rabbitService.handleMessage(event.getEventType().name(), event, IProcessEvent.class.getDeclaredMethods()[0].toString());
     }
 }

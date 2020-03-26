@@ -16,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 public class PublishXmlService {
 
     private final RabbitService rabbitService;
-    private final String EXCHANGE_TIPE = "topic";
     private final String QUEUE_NAME = "xml-messages";
     private final String ROUTING_KEY = "xml-messages-key";
     private final String EXCHANGE_NAME = "xml-messages-exchange";
@@ -33,7 +32,7 @@ public class PublishXmlService {
         try {
             channel = this.rabbitService.createChannel();
 
-            this.rabbitService.declareExchange(EXCHANGE_NAME, EXCHANGE_TIPE);
+            this.rabbitService.declareExchange(EXCHANGE_NAME);
 
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 
@@ -57,7 +56,7 @@ public class PublishXmlService {
 
             MessageEvent event = new MessageEvent(EventType.SEND_XML, menssagem);
 
-            this.rabbitService.handleMessage(QUEUE_NAME, EXCHANGE_NAME, EXCHANGE_TIPE, ROUTING_KEY, event, IProcessEvent.class.getDeclaredMethods()[0].toString());
+            this.rabbitService.handleMessage(event.getEventType().name(), event, IProcessEvent.class.getDeclaredMethods()[0].toString());
 
         } catch (IOException e) {
             e.printStackTrace();

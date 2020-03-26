@@ -1,4 +1,4 @@
-package br.kuhnen.menssages.service.message;
+package br.kuhnen.menssages.service.xml;
 
 import br.kuhnen.menssages.enuns.EventType;
 import br.kuhnen.menssages.interfaces.IEvent;
@@ -10,28 +10,31 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 
 @Service
-public class ReceiveMessagesService implements IProcessEvent {
+public class XmlProcessService implements IProcessEvent {
 
     private final RabbitService rabbitService;
+    private final String QUEUE_NAME = "xml-messages";
+    private final String ROUTING_KEY = "xml-messages-key";
+    private final String EXCHANGE_NAME = "xml-messages-exchange";
 
     @Autowired
-    public ReceiveMessagesService(RabbitService rabbitService) {
+    public XmlProcessService(RabbitService rabbitService) {
         this.rabbitService = rabbitService;
     }
 
     @PostConstruct
-    public void listenMessages() {
-//        this.receiveMessages();
+    public void registerConsumers() {
         String handlerName = this.getClass().getName();
         System.out.println("Registrando o evento " + handlerName);
 
-        this.rabbitService.registerQueue(EventType.SEND_USUARIO_MENSAGEM.name(), handlerName, this::processEvents, 2);
+        this.rabbitService.registerQueue(EventType.SEND_XML.name(), handlerName, this::processEvents, 2);
     }
 
     @Override
     public void processEvents(IEvent event) {
-        System.out.println("Processando evento recebido. " + event.getType() + "Clazz: " + event.getClass());
+        System.out.println("Recebido evento " + event.getType());
         System.out.println(event.getMessage());
-    }
 
+
+    }
 }

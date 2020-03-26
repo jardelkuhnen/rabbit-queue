@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
@@ -25,6 +26,10 @@ public class RabbitService {
 
     @Autowired
     private RabbitConfiguration rabbitConfiguration;
+    private final String EXCHANGE_TIPE = "topic";
+    private final Boolean DURABLE = Boolean.TRUE;
+    private final Boolean AUTO_DELETE = Boolean.TRUE    ;
+    private final Boolean EXCLUSIVE = Boolean.FALSE;
 
     private Connection connection;
 
@@ -65,12 +70,12 @@ public class RabbitService {
         return null;
     }
 
-    public void declareExchange(String exchangeName, String exchangeTipe) {
+    public void declareExchange(String exchangeName) {
 
         Channel channel = null;
         try {
             channel = this.getRabbitConnection().createChannel();
-            channel.exchangeDeclare(exchangeName, exchangeTipe);
+            channel.exchangeDeclare(exchangeName, EXCHANGE_TIPE);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -100,22 +105,25 @@ public class RabbitService {
         return Boolean.TRUE;
     }
 
-    public void registerQueue(String handlerName, ICallbackEvent callback, Integer quantidadeConsumers, String queueName, String exchangeName, String routingKey) {
+    public void registerQueue(String eventName, String handlerName, ICallbackEvent callback, Integer quantidadeConsumers) {
 
         Channel channel = null;
 
         try {
             channel = this.createChannel();
 
-            this.declareExchange(exchangeName, "topic");
-            channel.queueDeclare(queueName, false, false, false, null);
+            String routingKey = eventName;
+            String queueName = String.join(".", eventName, handlerName);
 
-            channel.queueBind(queueName, exchangeName, routingKey);
+            this.declareExchange(eventName);
+            channel.queueDeclare(queueName, DURABLE, EXCLUSIVE, AUTO_DELETE, new HashMap<>());
+
+            channel.queueBind(queueName, eventName, routingKey);
 
             for (int i = 0; i < quantidadeConsumers; i++) {
                 Consumer consumer = new EventConsumer(callback, handlerName, channel);
 
-                channel.basicConsume(queueName, true, consumer);
+                channel.basicConsume(queueName, false, consumer);
             }
 
             channel = null;
@@ -125,7 +133,7 @@ public class RabbitService {
         }
     }
 
-    public void handleMessage(String queueName, String exchangeName, String exchangeTipe, String routingKey, IEvent event, String handlerName) {
+    public void handleMessage(String eventName, IEvent event, String handlerName) {
 
         Channel channel = null;
 
@@ -133,12 +141,12 @@ public class RabbitService {
 
             channel = this.createChannel();
 
-            channel.exchangeDeclare(exchangeName, exchangeTipe);
+            channel.exchangeDeclare(eventName, this.EXCHANGE_TIPE);
 
             ObjectMapper mapper = new ObjectMapper();
             String message = mapper.writeValueAsString(new EventPayload(event, handlerName));
             message = StringUtils.stripAccents(message);
-            channel.basicPublish(exchangeName, routingKey, null, message.getBytes());
+            channel.basicPublish(eventName, eventName, null, message.getBytes());
 
             System.out.println("Mensagem enviada. " + "Horário: " + LocalDateTime.now());
 
