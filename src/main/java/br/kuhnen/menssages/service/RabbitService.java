@@ -28,7 +28,7 @@ public class RabbitService {
     private RabbitConfiguration rabbitConfiguration;
     private final String EXCHANGE_TIPE = "topic";
     private final Boolean DURABLE = Boolean.TRUE;
-    private final Boolean AUTO_DELETE = Boolean.TRUE    ;
+    private final Boolean AUTO_DELETE = Boolean.TRUE;
     private final Boolean EXCLUSIVE = Boolean.FALSE;
 
     private Connection connection;
@@ -48,10 +48,10 @@ public class RabbitService {
 
             return this.connection = factory.newConnection();
         } catch (IOException e) {
-            log.error("Erro ao criar connection");
+            log.error("Error to create connection");
             e.printStackTrace();
         } catch (TimeoutException e) {
-            log.error("Erro ao criar connection");
+            log.error("Errot to create connection");
             e.printStackTrace();
         }
 
@@ -63,7 +63,7 @@ public class RabbitService {
         try {
             return this.getRabbitConnection().createChannel();
         } catch (IOException e) {
-            log.error("Erro ao criar channel");
+            log.error("Error to create channel");
             e.printStackTrace();
         }
 
@@ -99,7 +99,6 @@ public class RabbitService {
                 e.printStackTrace();
                 return Boolean.FALSE;
             }
-
         }
 
         return Boolean.TRUE;
@@ -146,9 +145,11 @@ public class RabbitService {
             ObjectMapper mapper = new ObjectMapper();
             String message = mapper.writeValueAsString(new EventPayload(event, handlerName));
             message = StringUtils.stripAccents(message);
+
+            log.info("Message sended. " + "Time: " + LocalDateTime.now());
+
             channel.basicPublish(eventName, eventName, null, message.getBytes());
 
-            System.out.println("Mensagem enviada. " + "Horário: " + LocalDateTime.now());
 
         } catch (IOException e) {
             e.printStackTrace();

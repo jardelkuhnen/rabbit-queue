@@ -4,7 +4,7 @@ import br.kuhnen.menssages.enuns.EventType;
 import br.kuhnen.menssages.event.MessageEvent;
 import br.kuhnen.menssages.interfaces.IProcessEvent;
 import br.kuhnen.menssages.service.RabbitService;
-import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,49 +12,23 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Service
 public class PublishXmlService {
 
     private final RabbitService rabbitService;
-    private final String QUEUE_NAME = "xml-messages";
-    private final String ROUTING_KEY = "xml-messages-key";
-    private final String EXCHANGE_NAME = "xml-messages-exchange";
 
     @Autowired
     public PublishXmlService(RabbitService rabbitService) {
         this.rabbitService = rabbitService;
     }
 
-    public void sendXml(MultipartFile file) {
-
-        Channel channel = null;
+    public void sendXmlFile(MultipartFile file) {
 
         try {
-            channel = this.rabbitService.createChannel();
+            String message = new String(file.getBytes(), StandardCharsets.UTF_8);
 
-            this.rabbitService.declareExchange(EXCHANGE_NAME);
-
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-
-            System.out.println("Mensagem enviada: " + file.getName());
-
-            channel.basicPublish(EXCHANGE_NAME, ROUTING_KEY, null, file.getBytes());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            this.rabbitService.closeChannel(channel);
-        }
-
-
-    }
-
-    public void enviarXml(MultipartFile file) {
-
-        try {
-            String menssagem = new String(file.getBytes(), StandardCharsets.UTF_8);
-
-            MessageEvent event = new MessageEvent(EventType.SEND_XML, menssagem);
+            MessageEvent event = new MessageEvent(EventType.SEND_XML, message);
 
             this.rabbitService.handleMessage(event.getEventType().name(), event, IProcessEvent.class.getDeclaredMethods()[0].toString());
 

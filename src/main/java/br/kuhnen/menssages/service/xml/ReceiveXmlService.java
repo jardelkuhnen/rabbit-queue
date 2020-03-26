@@ -6,11 +6,13 @@ import br.kuhnen.menssages.interfaces.IProcessEvent;
 import br.kuhnen.menssages.service.RabbitService;
 import br.kuhnen.menssages.util.InfoXml;
 import br.kuhnen.menssages.util.XmlExtractorUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
+@Slf4j
 @Service
 public class ReceiveXmlService implements IProcessEvent {
 
@@ -22,20 +24,19 @@ public class ReceiveXmlService implements IProcessEvent {
     }
 
     @PostConstruct
-    public void listenMessages() {
-//        this.receiveXmls();
+    public void registerEvents() {
         String handlerName = this.getClass().getName();
-        System.out.println("Registrando o evento " + handlerName);
+        log.info("Registering the event: " + handlerName);
 
         this.rabbitService.registerQueue(EventType.SEND_XML.name(), handlerName, this::processEvents, 2);
     }
 
     @Override
     public void processEvents(IEvent event) {
-        System.out.println("Recebido evento " + event.getClass() + " para processamento");
+        log.info("Received event: " + event.getClass() + " to be processed");
 
         InfoXml infoXml = XmlExtractorUtil.getInfoXml(event.getMessage().getBytes());
-        System.out.println(infoXml);
+        log.info(infoXml.getXml());
     }
 
 }

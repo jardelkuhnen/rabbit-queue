@@ -39,7 +39,7 @@ public class CallbackTask implements Runnable {
     public void run() {
         try {
 
-            log.debug("Iniciado callback para disparo do evento");
+            log.info("Iniciado callback para disparo do evento");
 
             ObjectMapper mapper = new ObjectMapper();
             String message = new String(body, StandardCharsets.UTF_8);
@@ -55,7 +55,7 @@ public class CallbackTask implements Runnable {
 
             channel.basicAck(deliveryTag, false);
 
-            log.debug("Evento disparado: " + event.getType());
+            log.info("Evento disparado: " + event.getType());
 
         } catch (JsonProcessingException | ClassNotFoundException e) {
             e.printStackTrace();

@@ -31,21 +31,20 @@ public class MessagesController {
 
     @PostMapping
     @RequestMapping("/user")
-    public ResponseEntity enviarMensagem(@RequestBody String menssagem) {
-//        String retorno = this.publishMessagesService.enviarMensagem(menssagem);
-        this.publishMessagesService.enviarMsg(menssagem);
-        return ResponseEntity.ok("retorno");
+    public ResponseEntity sengMessage(@RequestBody String message) {
+
+        this.publishMessagesService.sendMessage(message);
+
+        return ResponseEntity.ok("Sended message to be processed");
     }
 
     @PostMapping
     @RequestMapping("/xml")
     public ResponseEntity postXml(@RequestParam("file") MultipartFile file) {
 
-//        this.publishXmlService.sendXml(file);
+        this.publishXmlService.sendXmlFile(file);
 
-        this.publishXmlService.enviarXml(file);
-
-        return ResponseEntity.ok("Enviado xml para processamento");
+        return ResponseEntity.ok("Sended xml to be processed");
     }
 
 }

@@ -28,7 +28,7 @@ public class EventPayload {
         try {
             this.event = mapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {
-            log.error("Erro ao executar o parsing ", e);
+            log.error("Error to execute the parsing ", e);
         }
     }
 
